@@ -1,1 +1,1266 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaaS Dashboard & Modules | Axiever</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0052ff;
+      --primary-hover: #0041cc;
+      --bg-gradient: radial-gradient(circle at 50% 50%, #f8fafc 0%, #f1f5f9 100%);
+      --card-bg: #ffffff;
+      --card-border: rgba(0, 0, 0, 0.05);
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      background-image: radial-gradient(#e2e8f0 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      overflow-x: hidden;
+    }
+
+    /* Header Section */
+    .header {
+      text-align: center;
+      max-width: 800px;
+      margin-bottom: 20px;
+    }
+    .header-tag {
+      color: #0052ff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+    .header-tag::before, .header-tag::after {
+      content: " — ";
+      color: #0052ff;
+    }
+    .header-title {
+      font-size: 42px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .header-desc {
+      font-size: 16px;
+      color: #64748b;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* Circular Layout Wrapper */
+    .circular-layout-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1100px;
+      height: 740px;
+      margin: 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* SVG Lines Overlay */
+    .connector-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .connector-line {
+      stroke: var(--theme-color);
+      stroke-width: 1.5px;
+      fill: none;
+      transition: stroke-width 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
+      opacity: 0.7;
+    }
+    .connector-line.active {
+      stroke-width: 2.5px;
+      opacity: 1;
+      filter: drop-shadow(0 0 3px var(--theme-color));
+    }
+
+    /* Dashboard Card (Center Piece) */
+    .crm_dashboard-card {
+      position: absolute;
+      width: 530px;
+      height: 380px;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 16px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.06);
+      z-index: 3;
+      display: flex;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    /* Dashboard Sidebar */
+    .crm_dashboard-sidebar {
+      width: 130px;
+      border-right: 1px solid #f1f5f9;
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      flex-shrink: 0;
+    }
+    .crm_sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+    .crm_sidebar-logo svg {
+      width: 14px;
+      height: 14px;
+    }
+    .crm_sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .crm_menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 9.5px;
+      font-weight: 600;
+      color: #64748b;
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    /* Home (Active crm_state) styled exactly like Axi-2.png (light blue bg with blue text/icon) */
+    .crm_menu-item.active {
+      background: rgba(0, 82, 255, 0.08);
+      color: #0052ff;
+    }
+    .crm_menu-item svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* Dashboard Main Area */
+    .crm_dashboard-main {
+      flex: 1;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+    .main-header {
+      margin-bottom: 8px;
+    }
+    .main-header h4 {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* crm_stat Cards Row */
+    .crm_stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .crm_stat-card {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: 8px;
+      padding: 6px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+    }
+    .crm_stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .crm_stat-title {
+      font-size: 8px;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .crm_stat-value-container {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .crm_stat-value {
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .crm_stat-trend {
+      font-size: 6.5px;
+      font-weight: 700;
+      color: #10b981;
+      /* background: #emerald-100; */
+      background-color: #ecfdf5;
+      padding: 1px 3px;
+      border-radius: 3px;
+    }
+    .crm_stat-icon {
+      width: 11px;
+      height: 11px;
+      opacity: 0.9;
+    }
+
+    /* Widgets Row */
+    .crm_widgets-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex: 1;
+    }
+    .crm_widget {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+    .crm_widget h5 {
+      font-size: 9px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    /* Funnel Widget */
+    .crm_funnel-container {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      margin-top: 5px;
+    }
+    .crm_funnel-rows {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      position: relative;
+      z-index: 2;
+    }
+    .crm_funnel-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      height: 22px;
+    }
+    /* Horizontal dashed line connecting stage texts and metrics */
+    .crm_funnel-row::before {
+      content: '';
+      position: absolute;
+      left: 50px;
+      right: 35px;
+      top: 50%;
+      border-top: 1px dashed #cbd5e1;
+      z-index: 1;
+    }
+    .crm_funnel-label, .crm_funnel-value {
+      background: #ffffff;
+      position: relative;
+      z-index: 2;
+      font-size: 8px;
+      font-weight: 600;
+      line-height: 22px;
+    }
+    .crm_funnel-label {
+      padding-right: 4px;
+      color: #64748b;
+      width: 55px;
+    }
+    .crm_funnel-value {
+      padding-left: 4px;
+      color: #0f172a;
+      width: 30px;
+      text-align: right;
+    }
+    .crm_funnel-visual {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 100px;
+      z-index: 3;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .crm_funnel-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Activity Feed Widget */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      justify-content: space-between;
+      height: 100px;
+      margin-top: 5px;
+    }
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 22px;
+    }
+    .crm_act-icon {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .crm_act-icon svg {
+      width: 9px;
+      height: 9px;
+    }
+    .crm_act-info {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .crm_act-title {
+      font-size: 8px;
+      font-weight: 600;
+    }
+    .crm_act-sub {
+      font-size: 7px;
+      color: #64748b;
+    }
+    .crm_act-time {
+      font-size: 7px;
+      color: #64748b;
+    }
+
+    /* Revenue Trend Widget */
+    .chart-container {
+      flex: 1;
+      position: relative;
+      min-height: 50px;
+      display: flex;
+      align-items: flex-end;
+    }
+    .chart-tooltip {
+      background: #0f172a;
+      color: #ffffff;
+      border-radius: 4px;
+      padding: 3px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 10;
+    }
+    .tooltip-val {
+      font-size: 7px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .tooltip-lbl {
+      font-size: 6px;
+      opacity: 0.7;
+    }
+
+    /* Channels Widget */
+    .donut-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex: 1;
+      height: 80px;
+      margin-top: 5px;
+    }
+    .donut-visual {
+      position: relative;
+      width: 48px;
+      height: 48px;
+    }
+    .donut-svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    .donut-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+    .donut-total {
+      font-size: 9px;
+      font-weight: 700;
+    }
+    .donut-lbl {
+      font-size: 6px;
+      color: #64748b;
+    }
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 7.5px;
+      font-weight: 500;
+      color: #64748b;
+    }
+    .legend-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+    .legend-val {
+      font-weight: 700;
+      color: #0f172a;
+      margin-left: 2px;
+    }
+
+    /* Dashboard Targets (Hollow Circles) */
+    .dash-target {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid var(--theme-color);
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+    }
+    .tgt-01 { left: 50%; top: 0; --theme-color: #0052ff; }
+    .tgt-02 { left: 0; top: 15%; --theme-color: #10b981; }
+    .tgt-03 { left: 0; top: 50%; --theme-color: #8b5cf6; }
+    .tgt-04 { left: 0; top: 85%; --theme-color: #f59e0b; }
+    .tgt-05 { left: 18%; top: 100%; --theme-color: #ec4899; }
+    .tgt-06 { left: 50%; top: 100%; --theme-color: #06b6d4; }
+    .tgt-07 { left: 82%; top: 100%; --theme-color: #f59e0b; }
+    .tgt-08 { left: 100%; top: 85%; --theme-color: #8b5cf6; }
+    .tgt-09 { left: 100%; top: 50%; --theme-color: #10b981; }
+    .tgt-10 { left: 100%; top: 15%; --theme-color: #ec4899; }
+
+    /* Badge Wrappers */
+    .crm_badge-wrapper {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 5;
+    }
+    .crm_badge-icon-container {
+      position: relative;
+      width: 58px;
+      height: 58px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      cursor: pointer;
+      background: #ffffff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .crm_badge-icon-container::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+      border-radius: 50%;
+      background-color: var(--theme-bg);
+      border: 1px solid rgba(0, 82, 255, 0.04);
+      z-index: -1;
+      transition: all 0.3s ease;
+    }
+    .crm_badge-icon-container:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+    .crm_badge-icon-container:hover::before {
+      transform: scale(1.15);
+    }
+    
+    /* Recreated badges to have a solid theme-color background and white icons inside */
+    .crm_badge-icon {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      background-color: var(--theme-color); /* Solid colored background */
+      color: #ffffff; /* White icon inside */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .crm_badge-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .crm_badge-text {
+      position: absolute;
+      width: 190px;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+    }
+    .crm_badge-text h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 3px;
+      transition: color 0.3s ease;
+      line-height: 1.25;
+    }
+    .crm_badge-text p {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.4;
+      font-weight: 400;
+    }
+
+    /* Badge Alignment Positions (Arranged in counter-clockwise ring matching Axi-2.png exactly) */
+    .bw-01 { transform: translate(-50%, -50%) rotate(-90deg) translate(330px) rotate(90deg); }
+    .bw-02 { transform: translate(-50%, -50%) rotate(-126deg) translate(330px) rotate(126deg); }
+    .bw-03 { transform: translate(-50%, -50%) rotate(-162deg) translate(330px) rotate(162deg); }
+    .bw-04 { transform: translate(-50%, -50%) rotate(-198deg) translate(330px) rotate(198deg); }
+    .bw-05 { transform: translate(-50%, -50%) rotate(-234deg) translate(330px) rotate(234deg); }
+    .bw-06 { transform: translate(-50%, -50%) rotate(-270deg) translate(330px) rotate(270deg); }
+    .bw-07 { transform: translate(-50%, -50%) rotate(-306deg) translate(330px) rotate(306deg); }
+    .bw-08 { transform: translate(-50%, -50%) rotate(-342deg) translate(330px) rotate(342deg); }
+    .bw-09 { transform: translate(-50%, -50%) rotate(-378deg) translate(330px) rotate(378deg); }
+    .bw-10 { transform: translate(-50%, -50%) rotate(-414deg) translate(330px) rotate(414deg); }
+
+    /* CTA Button */
+    .cta-container {
+      margin: 40px 0 20px 0;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #0052ff;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14.5px;
+      padding: 13px 26px;
+      border-radius: 8px;
+      box-shadow: 0 4px 14px rgba(0, 82, 255, 0.25);
+      transition: all 0.2s ease-in-out;
+    }
+    .cta-btn:hover {
+      background-color: #0041cc;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 82, 255, 0.35);
+    }
+    .cta-arrow {
+      transition: transform 0.2s ease;
+    }
+    .cta-btn:hover .cta-arrow {
+      transform: translateX(4px);
+    }
+
+    /* Responsive styling for Mobile / Tablet */
+    @media (max-width: 1023px) {
+      body {
+        padding: 30px 15px;
+      }
+      .header-title {
+        font-size: 32px;
+      }
+      .circular-layout-wrapper {
+        height: auto;
+        flex-direction: column;
+        gap: 30px;
+        padding: 20px 0;
+      }
+      .connector-svg {
+        display: none !important;
+      }
+      .crm_dashboard-card {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none !important;
+        width: 100%;
+        max-width: 530px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+      }
+      .dash-target {
+        display: none !important;
+      }
+      .badges-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        width: 100%;
+        max-width: 530px;
+        margin-top: 20px;
+      }
+      .crm_badge-wrapper {
+        position: relative;
+        left: auto;
+        top: auto;
+        width: 100%;
+        height: auto;
+        transform: none !important;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        border-radius: 14px;
+        padding: 14px;
+        gap: 14px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+      }
+      .crm_badge-icon-container {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        box-shadow: none;
+      }
+      .crm_badge-icon-container::before {
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+      }
+      .crm_badge-icon {
+        width: 38px;
+        height: 38px;
+      }
+      .crm_badge-text {
+        position: relative;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        transform: none !important;
+        width: auto !important;
+        text-align: left !important;
+      }
+    }
+
+    /* Scaling fix for small mobile phones to avoid dashboard overflow */
+    @media (max-width: 550px) {
+      .crm_dashboard-card {
+        transform: scale(0.7);
+        margin: -50px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <span class="header-tag">All-in-One AI Sales Platform</span>
+    <h1 class="header-title">Everything your sales team needs — built to be simple</h1>
+    <p class="header-desc">From finding leads to closing deals, Axiever gives you every tool to automate,<br>engage, and grow — all in one platform.</p>
+  </header>
+
+  <!-- Interactive Circular Layout -->
+  <div class="circular-layout-wrapper">
+    
+    <!-- SVG Connector Lines & Ring -->
+    <svg id="connector-svg" class="connector-svg">
+      <!-- Dotted ring around the dashboard -->
+      <circle id="dotted-circle" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 4" />
+      
+      <!-- Connector Lines (stroke is controlled dynamically per theme-color) -->
+      <path class="connector-line" data-from=".bw-01 .crm_badge-icon-container" data-to=".tgt-01" />
+      <path class="connector-line" data-from=".bw-02 .crm_badge-icon-container" data-to=".tgt-02" />
+      <path class="connector-line" data-from=".bw-03 .crm_badge-icon-container" data-to=".tgt-03" />
+      <path class="connector-line" data-from=".bw-04 .crm_badge-icon-container" data-to=".tgt-04" />
+      <path class="connector-line" data-from=".bw-05 .crm_badge-icon-container" data-to=".tgt-05" />
+      <path class="connector-line" data-from=".bw-06 .crm_badge-icon-container" data-to=".tgt-06" />
+      <path class="connector-line" data-from=".bw-07 .crm_badge-icon-container" data-to=".tgt-07" />
+      <path class="connector-line" data-from=".bw-08 .crm_badge-icon-container" data-to=".tgt-08" />
+      <path class="connector-line" data-from=".bw-09 .crm_badge-icon-container" data-to=".tgt-09" />
+      <path class="connector-line" data-from=".bw-10 .crm_badge-icon-container" data-to=".tgt-10" />
+    </svg>
+
+    <!-- Dashboard Component (Center) -->
+    <div class="crm_dashboard-card">
+      <div class="dash-target tgt-01"></div>
+      <div class="dash-target tgt-02"></div>
+      <div class="dash-target tgt-03"></div>
+      <div class="dash-target tgt-04"></div>
+      <div class="dash-target tgt-05"></div>
+      <div class="dash-target tgt-06"></div>
+      <div class="dash-target tgt-07"></div>
+      <div class="dash-target tgt-08"></div>
+      <div class="dash-target tgt-09"></div>
+      <div class="dash-target tgt-10"></div>
+
+      <!-- Sidebar -->
+      <aside class="crm_dashboard-sidebar">
+        <div class="crm_sidebar-logo">
+          <svg viewBox="0 0 100 100">
+            <path d="M50 12 L88 88 L68 88 L50 50 L32 88 L12 88 Z" fill="#0052ff" />
+            <path d="M50 40 L58 60 L42 60 Z" fill="#0052ff" />
+          </svg>
+          <span>AXIEVER</span>
+        </div>
+        <nav class="crm_sidebar-menu">
+          <div class="crm_menu-item active">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
+            Home
+          </div>
+          <div class="crm_menu-item">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="currentColor"/></svg>
+            Leads
+          </div>
+          <div class="crm_menu-item">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/></svg>
+            Inbox
+          </div>
+          <div class="crm_menu-item">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/></svg>
+            Campaigns
+          </div>
+          <div class="crm_menu-item">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2a2 2 0 0 1 2 2v1h2a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3h2V4a2 2 0 0 1 2-2zm0 5H8a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-4zm-2.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="currentColor"/>
+            </svg>
+            AI SDR
+          </div>
+          <div class="crm_menu-item">
+            <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" fill="currentColor"/></svg>
+            Meetings
+          </div>
+          <div class="crm_menu-item">
+            <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z" fill="currentColor"/></svg>
+            Reports
+          </div>
+          <div class="crm_menu-item">
+            <svg viewBox="0 0 24 24"><path d="M12 11.55C9.64 9.35 6.48 8 3 8v11c3.48 0 6.64 1.35 9 3.55 2.36-2.2 5.52-3.55 9-3.55V8c-3.48 0-6.64 1.35-9 3.55z" fill="currentColor"/></svg>
+            Knowledge
+          </div>
+          <div class="crm_menu-item">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="currentColor"/></svg>
+            Customers
+          </div>
+          <div class="crm_menu-item">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg>
+            Settings
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="crm_dashboard-main">
+        <div class="main-header">
+          <h4>Dashboard</h4>
+        </div>
+
+        <!-- Top row crm_stats -->
+        <div class="crm_stats-row">
+          <div class="crm_stat-card">
+            <div class="crm_stat-info">
+              <span class="crm_stat-title">Leads</span>
+              <div class="crm_stat-value-container">
+                <span class="crm_stat-value">2,450</span>
+                <span class="crm_stat-trend">▲ 18%</span>
+              </div>
+            </div>
+            <svg class="crm_stat-icon" style="color:#f59e0b;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="8" r="4"/><path d="M12 18a6 6 0 0 1 10 0"/></svg>
+          </div>
+          <div class="crm_stat-card">
+            <div class="crm_stat-info">
+              <span class="crm_stat-title">Meetings</span>
+              <div class="crm_stat-value-container">
+                <span class="crm_stat-value">48</span>
+                <span class="crm_stat-trend">▲ 24%</span>
+              </div>
+            </div>
+            <svg class="crm_stat-icon" style="color:#10b981;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+          </div>
+          <div class="crm_stat-card">
+            <div class="crm_stat-info">
+              <span class="crm_stat-title">Revenue</span>
+              <div class="crm_stat-value-container">
+                <span class="crm_stat-value">$248K</span>
+                <span class="crm_stat-trend">▲ 32%</span>
+              </div>
+            </div>
+            <svg class="crm_stat-icon" style="color:#f59e0b;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="12" y1="19" x2="12" y2="5"/></svg>
+          </div>
+          <div class="crm_stat-card">
+            <div class="crm_stat-info">
+              <span class="crm_stat-title">Conversion</span>
+              <div class="crm_stat-value-container">
+                <span class="crm_stat-value">28.6%</span>
+                <span class="crm_stat-trend">▲ 16%</span>
+              </div>
+            </div>
+            <svg class="crm_stat-icon" style="color:#10b981;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4"/></svg>
+          </div>
+        </div>
+
+        <!-- Middle Row widgets -->
+        <div class="crm_widgets-row">
+          <!-- Pipeline Overview -->
+          <div class="crm_widget crm_funnel-widget">
+            <h5>Pipeline Overview</h5>
+            <div class="crm_funnel-container">
+              <!-- Visual Funnel Stack (Polygons filled to block horizontal line) -->
+              <div class="crm_funnel-visual">
+                <svg viewBox="0 0 120 100" class="crm_funnel-svg">
+                  <polygon points="10,0 110,0 92,22 28,22" fill="#0052ff" />
+                  <polygon points="30,25 90,25 78,47 42,47" fill="#10b981" />
+                  <polygon points="44,50 76,50 67,72 53,72" fill="#f59e0b" />
+                  <polygon points="55,75 65,75 60,97" fill="#059669" />
+                </svg>
+              </div>
+
+              <!-- Dotted Row Alignment -->
+              <div class="crm_funnel-rows">
+                <div class="crm_funnel-row">
+                  <span class="crm_funnel-label">New Leads</span>
+                  <span class="crm_funnel-value">2,450</span>
+                </div>
+                <div class="crm_funnel-row">
+                  <span class="crm_funnel-label">Qualified</span>
+                  <span class="crm_funnel-value">850</span>
+                </div>
+                <div class="crm_funnel-row">
+                  <span class="crm_funnel-label">Proposal Sent</span>
+                  <span class="crm_funnel-value">240</span>
+                </div>
+                <div class="crm_funnel-row">
+                  <span class="crm_funnel-label">Won</span>
+                  <span class="crm_funnel-value">48</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Feed -->
+          <div class="crm_widget activity-widget">
+            <h5>Activity Feed</h5>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="crm_act-icon" style="background:rgba(0, 82, 255, 0.08); color:#0052ff;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                </div>
+                <div class="crm_act-info">
+                  <span class="crm_act-title">New lead added</span>
+                  <span class="crm_act-sub">Acme Corp</span>
+                </div>
+                <span class="crm_act-time">2m ago</span>
+              </div>
+              <div class="activity-item">
+                <div class="crm_act-icon" style="background:rgba(16, 185, 129, 0.08); color:#10b981;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><path d="M22 6l-10 7L2 6" /></svg>
+                </div>
+                <div class="crm_act-info">
+                  <span class="crm_act-title">Email opened</span>
+                  <span class="crm_act-sub">TechNova</span>
+                </div>
+                <span class="crm_act-time">5m ago</span>
+              </div>
+              <div class="activity-item">
+                <div class="crm_act-icon" style="background:rgba(139, 92, 246, 0.08); color:#8b5cf6;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                </div>
+                <div class="crm_act-info">
+                  <span class="crm_act-title">Meeting booked</span>
+                  <span class="crm_act-sub">Global Inc</span>
+                </div>
+                <span class="crm_act-time">15m ago</span>
+              </div>
+              <div class="activity-item">
+                <div class="crm_act-icon" style="background:rgba(16, 185, 129, 0.08); color:#10b981;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                </div>
+                <div class="crm_act-info">
+                  <span class="crm_act-title">Deal won</span>
+                  <span class="crm_act-sub">BrightScale</span>
+                </div>
+                <span class="crm_act-time">1h ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row widgets -->
+        <div class="crm_widgets-row" style="margin-bottom:0;">
+          <!-- Revenue Trend -->
+          <div class="crm_widget revenue-trend-widget">
+            <h5>Revenue Trend</h5>
+            <div class="chart-container">
+              <svg viewBox="0 0 200 80" style="width:100%; height:100%; max-height: 60px;">
+                <defs>
+                  <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#0052ff" stop-opacity="0.15"/>
+                    <stop offset="100%" stop-color="#0052ff" stop-opacity="0.0"/>
+                  </linearGradient>
+                </defs>
+                <!-- Background faint grid lines -->
+                <line x1="0" y1="20" x2="200" y2="20" stroke="#f1f5f9" stroke-width="0.8" />
+                <line x1="0" y1="40" x2="200" y2="40" stroke="#f1f5f9" stroke-width="0.8" />
+                <line x1="0" y1="60" x2="200" y2="60" stroke="#f1f5f9" stroke-width="0.8" />
+                <path d="M 0 50 Q 30 35 60 42 T 120 20 T 160 22 T 200 8 L 200 65 L 0 65 Z" fill="url(#trendGrad)" />
+                <path d="M 0 50 Q 30 35 60 42 T 120 20 T 160 22 T 200 8" fill="none" stroke="#0052ff" stroke-width="1.8" />
+                <circle cx="160" cy="22" r="2.5" fill="#0052ff" stroke="#ffffff" stroke-width="0.8" />
+              </svg>
+              <div class="chart-tooltip" style="left:73%; bottom:42%;">
+                <span class="tooltip-val">5248K</span>
+                <span class="tooltip-lbl">Revenue</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Channels -->
+          <div class="crm_widget channels-widget">
+            <h5>Top Channels</h5>
+            <div class="donut-container">
+              <div class="donut-visual">
+                <svg viewBox="0 0 36 36" class="donut-svg">
+                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f1f5f9" stroke-width="3"></circle>
+                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="#0052ff" stroke-width="3" stroke-dasharray="45 55" stroke-dashoffset="25"></circle>
+                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="25 75" stroke-dashoffset="-20"></circle>
+                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="#06b6d4" stroke-width="3" stroke-dasharray="20 80" stroke-dashoffset="-45"></circle>
+                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="#cbd5e1" stroke-width="3" stroke-dasharray="10 90" stroke-dashoffset="-65"></circle>
+                </svg>
+                <div class="donut-center">
+                  <span class="donut-total">2,450</span>
+                  <span class="donut-lbl">Total</span>
+                </div>
+              </div>
+              <div class="donut-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:#0052ff;"></span>Email <span class="legend-val">45%</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span>WhatsApp <span class="legend-val">25%</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:#06b6d4;"></span>Web Chat <span class="legend-val">20%</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:#cbd5e1;"></span>Others <span class="legend-val">10%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Outer Badge Ring (Wrappers) -->
+    <div class="badges-container">
+      
+      <!-- Badge 01 (Top) -->
+      <div class="crm_badge-wrapper bw-01" style="--theme-color: #0052ff; --theme-bg: rgba(0, 82, 255, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="5" /><path d="M11 9v4M9 11h4" /><path d="M20 20l-4.3-4.3" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="left: 42px; text-align: left;">
+          <h4>1. Find & Enrich Leads with AI</h4>
+          <p>Discover ideal prospects and enrich with accurate data.</p>
+        </div>
+      </div>
+
+      <!-- Badge 02 (Left alignment: text on left) -->
+      <div class="crm_badge-wrapper bw-02" style="--theme-color: #10b981; --theme-bg: rgba(16, 185, 129, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="right: 42px; text-align: right;">
+          <h4>2. Lead Scoring</h4>
+          <p>AI scores and ranks leads by buying intent.</p>
+        </div>
+      </div>
+
+      <!-- Badge 03 (Left alignment) -->
+      <div class="crm_badge-wrapper bw-03" style="--theme-color: #8b5cf6; --theme-bg: rgba(139, 92, 246, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="right: 42px; text-align: right;">
+          <h4>3. Sell & Run Campaigns</h4>
+          <p>Create, automate, and run multi-channel campaigns that get replies.</p>
+        </div>
+      </div>
+
+      <!-- Badge 04 (Left alignment) -->
+      <div class="crm_badge-wrapper bw-04" style="--theme-color: #f59e0b; --theme-bg: rgba(245, 158, 11, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="right: 42px; text-align: right;">
+          <h4>4. Every Channel, One Inbox</h4>
+          <p>Manage all conversations across WhatsApp, Email, Calls, SMS & more in one shared inbox.</p>
+        </div>
+      </div>
+
+      <!-- Badge 05 (Left alignment) -->
+      <div class="crm_badge-wrapper bw-05" style="--theme-color: #ec4899; --theme-bg: rgba(236, 72, 153, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="right: 42px; text-align: right;">
+          <h4>5. Book & Manage Appointments</h4>
+          <p>Read calendars, book best slots, send confirmations and reminders automatically.</p>
+        </div>
+      </div>
+
+      <!-- Badge 06 (Bottom) -->
+      <div class="crm_badge-wrapper bw-06" style="--theme-color: #06b6d4; --theme-bg: rgba(6, 182, 212, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="10" rx="2" /><circle cx="12" cy="5" r="2" /><path d="M12 7v4" /><line x1="8" y1="16" x2="8" y2="16.01" /><line x1="16" y1="16" x2="16" y2="16.01" /><path d="M9 19h6" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="left: 42px; text-align: left;">
+          <h4>6. Surveys, Read by AI</h4>
+          <p>Create surveys and let AI analyse sentiment, themes and NPS instantly.</p>
+        </div>
+      </div>
+
+      <!-- Badge 07 -->
+      <div class="crm_badge-wrapper bw-07" style="--theme-color: #f59e0b; --theme-bg: rgba(245, 158, 11, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="left: 42px; text-align: left;">
+          <h4>7. Knowledge Base</h4>
+          <p>Centralise your knowledge and let Sara answer instantly policies, prices, templates & more.</p>
+        </div>
+      </div>
+
+      <!-- Badge 08 -->
+      <div class="crm_badge-wrapper bw-08" style="--theme-color: #8b5cf6; --theme-bg: rgba(139, 92, 246, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="left: 42px; text-align: left;">
+          <h4>8. Reports & Analytics</h4>
+          <p>Track revenue, leads, conversion and campaign performance with live dashboards.</p>
+        </div>
+      </div>
+
+      <!-- Badge 09 -->
+      <div class="crm_badge-wrapper bw-09" style="--theme-color: #10b981; --theme-bg: rgba(16, 185, 129, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="left: 42px; text-align: left;">
+          <h4>9. Lead Management</h4>
+          <p>Pipeline view from discovery to closed deal with AI-suggested next steps and follow-ups.</p>
+        </div>
+      </div>
+
+      <!-- Badge 10 -->
+      <div class="crm_badge-wrapper bw-10" style="--theme-color: #ec4899; --theme-bg: rgba(236, 72, 153, 0.05);">
+        <div class="crm_badge-icon-container">
+          <div class="crm_badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Handshake vector icon -->
+              <path d="M10 14.5L6.5 11l-3.5 3.5 3.5 3.5z" />
+              <path d="M14 14.5l3.5-3.5 3.5 3.5-3.5 3.5z" />
+              <path d="M10 14.5c.5-.5 1-.5 1.5 0M12.5 12.5c.5-.5 1-.5 1.5 0" />
+            </svg>
+          </div>
+        </div>
+        <div class="crm_badge-text" style="left: 42px; text-align: left;">
+          <h4>10. Customer Management</h4>
+          <p>360° customer view with order history, health scores, conversations and preferences.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CTA Button -->
+  <div class="cta-container">
+    <a href="#" class="cta-btn">
+      Explore All Modules
+      <svg class="cta-arrow" viewBox="0 0 24 24" width="16" height="16">
+        <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </a>
+  </div>
+
+  <script>
+    const svg = document.getElementById('connector-svg');
+    const dottedCircle = document.getElementById('dotted-circle');
+
+    function drawLayout() {
+      if (window.innerWidth < 1024) return;
+      const svgRect = svg.getBoundingClientRect();
+      const dashboard = document.querySelector('.crm_dashboard-card');
+      if (!dashboard) return;
+
+      const dbRect = dashboard.getBoundingClientRect();
+      const cx = dbRect.left + dbRect.width / 2 - svgRect.left;
+      const cy = dbRect.top + dbRect.height / 2 - svgRect.top;
+
+      // Position the dotted circle in center of the layout
+      if (dottedCircle) {
+        dottedCircle.setAttribute('cx', cx);
+        dottedCircle.setAttribute('cy', cy);
+        dottedCircle.setAttribute('r', 330);
+      }
+
+      // Draw each connector line
+      const lines = document.querySelectorAll('.connector-line');
+      lines.forEach(line => {
+        const fromEl = document.querySelector(line.dataset.from);
+        const toEl = document.querySelector(line.dataset.to);
+
+        if (fromEl && toEl) {
+          const fromRect = fromEl.getBoundingClientRect();
+          const toRect = toEl.getBoundingClientRect();
+
+          const x1 = fromRect.left + fromRect.width / 2 - svgRect.left;
+          const y1 = fromRect.top + fromRect.height / 2 - svgRect.top;
+
+          const x2 = toRect.left + toRect.width / 2 - svgRect.left;
+          const y2 = toRect.top + toRect.height / 2 - svgRect.top;
+
+          // Draw straight line from circle badge to dashboard border target
+          line.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2}`);
+
+          // Match color and apply brand theme colors permanently
+          const wrapper = fromEl.closest('.crm_badge-wrapper');
+          if (wrapper) {
+            const themeColor = getComputedStyle(wrapper).getPropertyValue('--theme-color').trim();
+            line.style.setProperty('--theme-color', themeColor);
+            line.style.stroke = themeColor; // Apply color permanently
+          }
+        }
+      });
+    }
+
+    // Set up hover crm_states
+    const badges = document.querySelectorAll('.crm_badge-icon-container');
+    badges.forEach(badge => {
+      badge.addEventListener('mouseenter', () => {
+        const wrapper = badge.closest('.crm_badge-wrapper');
+        if (wrapper) {
+          const matchClass = Array.from(wrapper.classList).find(c => c.startsWith('bw-'));
+          const line = document.querySelector(`.connector-line[data-from*="${matchClass}"]`);
+          if (line) line.classList.add('active');
+          const title = wrapper.querySelector('.crm_badge-text h4');
+          if (title) title.style.color = getComputedStyle(wrapper).getPropertyValue('--theme-color').trim();
+        }
+      });
+
+      badge.addEventListener('mouseleave', () => {
+        const wrapper = badge.closest('.crm_badge-wrapper');
+        if (wrapper) {
+          const matchClass = Array.from(wrapper.classList).find(c => c.startsWith('bw-'));
+          const line = document.querySelector(`.connector-line[data-from*="${matchClass}"]`);
+          if (line) line.classList.remove('active');
+          const title = wrapper.querySelector('.crm_badge-text h4');
+          if (title) title.style.color = '';
+        }
+      });
+    });
+
+    // Run layout adjustments
+    window.addEventListener('load', () => {
+      drawLayout();
+      setTimeout(drawLayout, 100);
+      setTimeout(drawLayout, 500);
+    });
+    window.addEventListener('resize', drawLayout);
+    document.fonts.ready.then(drawLayout);
+  </script>
+</body>
+</html>
