@@ -12,7 +12,7 @@ RTechCoding is a comprehensive, AI-powered platform designed to streamline sales
 ## Tech Stack Recommendations
 
 | Component | Recommendation |
-| :--- | :--- |
+| :--- |
 | **Frontend Framework** | **Bootstrap 5** (for a responsive, clean, and minimalist corporate aesthetic) |
 | **Backend Language** | **PHP** (custom development for dynamic product/lead management and admin panels) |
 | **UI Design Patterns** | **Glassmorphism** effects, **Z-pattern** layouts, and spacious, white-background minimalism |
